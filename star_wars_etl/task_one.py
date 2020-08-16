@@ -14,23 +14,17 @@ We would like you to:
     something like this to the console.
 """
 import contextlib
-import json
 import random
 
-import requests
-
-from constants import STAR_WARS_API
+from common import (
+    DB_NAME,
+    STAR_WARS_API,
+    get_endpoint_data,
+    get_json,
+    open_db,
+    remove_none,
+)
 import create_db
-from db_connect import DB_NAME, open_db
-
-
-def remove_none(a_list):
-    return [x for x in a_list if x is not None]
-
-
-def is_valid_response(response):
-    if response and response.status_code == 200:
-        return response.json()
 
 
 def get_film_title(film_endpoint):
@@ -39,10 +33,10 @@ def get_film_title(film_endpoint):
     :param film_endpoint:
     :return:
     """
-    res = is_valid_response(requests.get(film_endpoint))
+    res = get_endpoint_data(film_endpoint)
     if not res:
         return
-    return res.get("title"), film_endpoint
+    return res.get("title"), res.get("url")
 
 
 def get_random_characters_films():
@@ -51,7 +45,7 @@ def get_random_characters_films():
     :return:
     """
     endpoint = f"{STAR_WARS_API}/people/{random.randint(1, 87)}"
-    res = is_valid_response(requests.get(endpoint))
+    res = get_endpoint_data(endpoint)
     if not res:
         return
 
@@ -60,7 +54,7 @@ def get_random_characters_films():
     if film_endpoints:
         films = [get_film_title(film_endpoint)
                  for film_endpoint in film_endpoints]
-    return res.get("name"), endpoint, remove_none(films)
+    return res.get("name"), res.get("url"), remove_none(films)
 
 
 def insert_characters(cursor, characters):
@@ -116,7 +110,7 @@ def get_character(cursor, name):
     :return:
     """
     sql = "SELECT id, name, endpoint FROM `character` WHERE name = %s"
-    cursor.execute(sql, (name, ))
+    cursor.execute(sql, (name,))
     return cursor.fetchone()
 
 
@@ -139,7 +133,7 @@ def get_film(cursor, title):
     :return:
     """
     sql = "SELECT id, title, endpoint FROM `film` WHERE title = %s"
-    cursor.execute(sql, (title, ))
+    cursor.execute(sql, (title,))
     return cursor.fetchone()
 
 
@@ -157,7 +151,7 @@ def get_character_join_film(cursor, character_id):
     INNER JOIN `film` ON character_film.film_id = film.id
     WHERE character.id = %s
     '''
-    cursor.execute(sql, (character_id, ))
+    cursor.execute(sql, (character_id,))
     return cursor.fetchall()
 
 
@@ -175,7 +169,7 @@ def get_film_join_character(cursor, film_id):
     INNER JOIN `film` ON character_film.film_id = film.id
     WHERE film.id = %s
     '''
-    cursor.execute(sql, (film_id, ))
+    cursor.execute(sql, (film_id,))
     return cursor.fetchall()
 
 
@@ -203,13 +197,21 @@ def add_characters_films(connection, characters_films, characters, films):
                 ]
                 if character_film_ids:
                     insert_character_film(cursor, character_film_ids)
-                connection.commit()
+            connection.commit()
+        return True
     except:
         connection.rollback()
         raise
 
 
 def get_output(connection):
+    """
+
+    :param connection:
+    :type connection:
+    :return:
+    :rtype:
+    """
     with contextlib.closing(connection.cursor()) as cursor:
         db_films = get_films(cursor)
         output = []
@@ -222,7 +224,8 @@ def get_output(connection):
                                   for character in film_characters]
                 }
             )
-        return output
+
+    return output
 
 
 def main():
@@ -246,7 +249,10 @@ def main():
         add_characters_films(connection, characters_films, characters, films)
         # retrieving the output
         output = get_output(connection)
-        print(json.dumps(output, indent=4, ensure_ascii=False))
+
+    json_output = get_json(output)
+    print(json_output)
+    return json_output
 
 
 if __name__ == "__main__":

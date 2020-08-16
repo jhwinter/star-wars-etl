@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 import contextlib
 
-from db_connect import open_db, DB_NAME
+from common import (
+    DB_NAME,
+    open_db,
+)
 
 
 def drop_database(cursor):
     """Drop database if already exists."""
-    cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+    return cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
 
 
 def create_database(cursor):
     """Create database"""
-    cursor.execute(f"CREATE DATABASE {DB_NAME}")
+    return cursor.execute(f"CREATE DATABASE {DB_NAME}")
 
 
 def create_tables(cursor):
@@ -49,6 +52,7 @@ def create_tables(cursor):
         CONSTRAINT `uc_character_film` UNIQUE (`character_id`, `film_id`)
     )'''
     cursor.execute(create_character_film)
+    return True
 
 
 def main():
@@ -61,6 +65,8 @@ def main():
             conn.select_db(DB_NAME)
 
             create_tables(cursor)
+
+    return True
 
 
 if __name__ == "__main__":
