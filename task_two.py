@@ -29,7 +29,7 @@ import requests
 from constants import STAR_WARS_API
 
 
-def get_film(api_film_id = 1):
+def get_film(api_film_id=1):
     return requests.get(f"{STAR_WARS_API}/films/{api_film_id}").json()
 
 
