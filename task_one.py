@@ -246,7 +246,7 @@ def main():
         add_characters_films(connection, characters_films, characters, films)
         # retrieving the output
         output = get_output(connection)
-        print(json.dumps(output, indent=4))
+        print(json.dumps(output, indent=4, ensure_ascii=False))
 
 
 if __name__ == "__main__":
