@@ -115,6 +115,7 @@ def format_film_data(film_data):
                 std_weight = convert_weight(film_data[key][idx]["mass"])
                 film_data[key][idx]["height"] = std_height
                 film_data[key][idx]["weight"] = std_weight
+                data.pop("mass", None)
 
     return film_data
 
