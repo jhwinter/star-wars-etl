@@ -18,7 +18,7 @@ your database's username, user's password, and the name of the database.
    DB_PASS="testing"
    DB_NAME="star_wars"
    ```
-2. Run `pipenv install && pipenv shell`
+3. Run `pipenv install && pipenv shell`
 
 ### Execute Tasks
 
