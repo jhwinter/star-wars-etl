@@ -1,7 +1,25 @@
-from unittest import TestCase
+import unittest
+
+from star_wars_etl.common import DB_NAME, open_db
+from star_wars_etl.task_one import (
+    get_film_title,
+    get_random_characters_films,
+    insert_characters,
+    insert_films,
+    insert_character_film,
+    get_characters,
+    get_character,
+    get_films,
+    get_film,
+    get_character_join_film,
+    get_film_join_character,
+    add_characters_films,
+    get_output,
+    main,
+)
 
 
-class TestTaskOne(TestCase):
+class TestTaskOne(unittest.TestCase):
     def test_get_film_title(self):
         self.fail()
 
@@ -43,3 +61,7 @@ class TestTaskOne(TestCase):
 
     def test_main(self):
         self.fail()
+
+
+if __name__ == "__main__":
+    unittest.main()

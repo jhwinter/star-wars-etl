@@ -16,7 +16,7 @@ We would like you to:
 import contextlib
 import random
 
-from common import (
+from .common import (
     DB_NAME,
     STAR_WARS_API,
     get_endpoint_data,

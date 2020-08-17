@@ -1,24 +1,36 @@
-from unittest import TestCase
+import unittest
+
+from star_wars_etl.task_two import (
+    cm_to_in,
+    in_to_ft,
+    convert_height,
+    kg_to_lb,
+    convert_weight,
+    get_film,
+    sanitize_cross_ref_mat_data,
+    format_film_data,
+    main,
+)
 
 
-class TestTaskTwo(TestCase):
+class TestTaskTwo(unittest.TestCase):
     def test_cm_to_in(self):
-        self.fail()
+        self.assertEqual(cm_to_in(50), 19.68504)
 
     def test_in_to_ft(self):
-        self.fail()
+        self.assertEqual(in_to_ft(50), 4)
 
     def test_convert_height(self):
-        self.fail()
+        self.assertEqual(convert_height(170), "5 ft 6.93 in")
 
     def test_kg_to_lb(self):
-        self.fail()
+        self.assertEqual(kg_to_lb(50), 110.2311)
 
     def test_convert_weight(self):
-        self.fail()
+        self.assertEqual(convert_weight(50), "110.23 lbs")
 
     def test_get_film(self):
-        self.fail()
+        pass
 
     def test_sanitize_cross_ref_mat_data(self):
         self.fail()
@@ -28,3 +40,7 @@ class TestTaskTwo(TestCase):
 
     def test_main(self):
         self.fail()
+
+
+if __name__ == "__main__":
+    unittest.main()

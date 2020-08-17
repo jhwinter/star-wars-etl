@@ -22,7 +22,7 @@ We would like you to do the following:
 """
 import pathlib
 
-from common import (
+from .common import (
     STAR_WARS_API,
     get_endpoint_data,
     get_json,
@@ -37,7 +37,7 @@ VEHICLES = "vehicles"
 
 def cm_to_in(x):
     """Converts centimeters to inches"""
-    return x * 0.39370
+    return x * 0.3937008
 
 
 def in_to_ft(x):
@@ -52,7 +52,7 @@ def convert_height(height):
         height_in = cm_to_in(int(height))
         return output.format(
             in_to_ft(height_in),
-            round(height_in % 12, 4)
+            round(height_in % 12, 2)
         )
     except ValueError:
         return output.format(height)
@@ -67,7 +67,7 @@ def convert_weight(mass):
     """Converts the mass in kilograms to pounds as a string"""
     output = "{} lbs"
     try:
-        return output.format(round(kg_to_lb(int(mass)), 4))
+        return output.format(round(kg_to_lb(int(mass)), 2))
     except ValueError:
         return output.format(mass)
 
@@ -115,7 +115,7 @@ def format_film_data(film_data):
                 std_weight = convert_weight(film_data[key][idx]["mass"])
                 film_data[key][idx]["height"] = std_height
                 film_data[key][idx]["weight"] = std_weight
-                data.pop("mass", None)
+                film_data.pop("mass", None)
 
     return film_data
 
