@@ -27,6 +27,13 @@ your database's username, user's password, and the name of the database.
 3. task one: Run `./task_one.py`
 task two: Run `./task_two.py`
 
+### Execute Tests
+
+1. Open a terminal and navigate to project's root directory
+2. Run a single test case: `python3 -m unittest star_wars_etl.test.{test_filename}`
+    - Example: `python3 -m unittest star_wars_etl.test.test_common`
+3. Run all test cases: `python3 -m unittest discover`
+
 ## Task One
 
 Gets 15 random characters and the names of the films they have been in,

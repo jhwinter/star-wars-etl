@@ -24,7 +24,7 @@ from .common import (
     open_db,
     remove_none,
 )
-import create_db
+from .create_db import main as create_db__main
 
 
 def get_film_title(film_endpoint):
@@ -256,5 +256,5 @@ def main():
 
 
 if __name__ == "__main__":
-    create_db.main()
+    create_db__main()
     main()
