@@ -22,11 +22,7 @@ We would like you to do the following:
 """
 import pathlib
 
-from .common import (
-    STAR_WARS_API,
-    get_endpoint_data,
-    get_json,
-)
+from star_wars_etl import utils
 
 CHARACTERS = "characters"
 PLANETS = "planets"
@@ -35,46 +31,9 @@ STARSHIPS = "starships"
 VEHICLES = "vehicles"
 
 
-def cm_to_in(x):
-    """Converts centimeters to inches"""
-    return x * 0.3937008
-
-
-def in_to_ft(x):
-    """Converts inches to feet --rounded down"""
-    return int(x // 12)
-
-
-def convert_height(height):
-    """Converts the height in centimeters to feet + inches as a string"""
-    output = "{} ft {} in"
-    try:
-        height_in = cm_to_in(int(height))
-        return output.format(
-            in_to_ft(height_in),
-            round(height_in % 12, 2)
-        )
-    except ValueError:
-        return output.format(height)
-
-
-def kg_to_lb(x):
-    """Converts kilograms to pounds"""
-    return x * 2.2046226218488
-
-
-def convert_weight(mass):
-    """Converts the mass in kilograms to pounds as a string"""
-    output = "{} lbs"
-    try:
-        return output.format(round(kg_to_lb(int(mass)), 2))
-    except ValueError:
-        return output.format(mass)
-
-
 def get_film(api_film_id=1):
     """Retrieves data from the film endpoint"""
-    return get_endpoint_data(f"{STAR_WARS_API}/films/{api_film_id}")
+    return utils.get_data(utils.generate_url("films")(api_film_id))
 
 
 def sanitize_cross_ref_mat_data(data, endpoint_name):
@@ -108,11 +67,11 @@ def format_film_data(film_data):
     for key in keys:
         for idx, endpoint in enumerate(film_data[key]):
             film_data[key][idx] = sanitize_cross_ref_mat_data(
-                get_endpoint_data(endpoint), key
+                utils.get_data(endpoint), key
             )
             if key == CHARACTERS:
-                std_height = convert_height(film_data[key][idx]["height"])
-                std_weight = convert_weight(film_data[key][idx]["mass"])
+                std_height = utils.convert_height(film_data[key][idx]["height"])
+                std_weight = utils.convert_weight(film_data[key][idx]["mass"])
                 film_data[key][idx]["height"] = std_height
                 film_data[key][idx]["weight"] = std_weight
                 film_data.pop("mass", None)
@@ -124,7 +83,7 @@ def main():
     """entrypoint of program"""
     film = get_film()
     output = format_film_data(film.copy())
-    json_output = get_json(output)
+    json_output = utils.get_json(output)
     parent_dir = pathlib.Path(__file__).parent
     with open(parent_dir.joinpath("task_two.json"), "w") as f:
         f.write(json_output)

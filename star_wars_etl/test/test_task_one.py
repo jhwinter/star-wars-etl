@@ -1,57 +1,57 @@
 import unittest
 
-from star_wars_etl.common import DB_NAME, open_db
-from star_wars_etl.task_one import (
-    get_film_title,
-    get_random_characters_films,
-    insert_characters,
-    insert_films,
-    insert_character_film,
-    get_characters,
-    get_character,
-    get_films,
-    get_film,
-    get_character_join_film,
-    get_film_join_character,
-    add_characters_films,
-    get_output,
-    main,
-)
+import responses
+
+from star_wars_etl import task_one, utils
+from star_wars_etl.test import test_db_utils
 
 
 class TestTaskOne(unittest.TestCase):
-    def test_get_film_title(self):
-        pass
+    @responses.activate
+    def test_get_film_data(self):
+        url = utils.generate_url("films")(1)
+        mock_res = {"title": "test film", "url": url}
+        responses.add(responses.GET, url, json=mock_res, status=200)
 
-    def test_get_random_characters_films(self):
-        pass
+        resp = task_one.get_film_data(url)
+        expected_result = (mock_res.get("title"), mock_res.get("url"))
+        self.assertEqual(resp, expected_result)
 
-    def test_insert_characters(self):
-        pass
+    @responses.activate
+    def test_get_characters_films(self):
+        char_url = utils.generate_url("people")(1)
+        film_url = utils.generate_url("films")
+        mock_char_res = {
+            "name": "test people",
+            "url": char_url,
+            "films": [
+                film_url(1),
+                film_url(2),
+                film_url(3),
+            ]
+        }
+        responses.add(responses.GET, char_url, json=mock_char_res, status=200)
 
-    def test_insert_films(self):
-        pass
+        mock_film_resps = [
+            {"title": "test film 1", "url": film_url(1)},
+            {"title": "test film 2", "url": film_url(2)},
+            {"title": "test film 3", "url": film_url(3)}
+        ]
+        responses.add(responses.GET, film_url(1),
+                      json=mock_film_resps[0], status=200)
+        responses.add(responses.GET, film_url(2),
+                      json=mock_film_resps[1], status=200)
+        responses.add(responses.GET, film_url(3),
+                      json=mock_film_resps[2], status=200)
 
-    def test_insert_character_film(self):
-        pass
-
-    def test_get_characters(self):
-        pass
-
-    def test_get_character(self):
-        pass
-
-    def test_get_films(self):
-        pass
-
-    def test_get_film(self):
-        pass
-
-    def test_get_character_join_film(self):
-        pass
-
-    def test_get_film_join_character(self):
-        pass
+        resp = task_one.get_characters_films(1)
+        expected_result = (
+            mock_char_res.get("name"),
+            mock_char_res.get("url"),
+            [(mock_res.get("title"), mock_res.get("url"))
+             for mock_res in mock_film_resps]
+        )
+        self.assertEqual(resp, expected_result)
 
     def test_add_characters_films(self):
         pass

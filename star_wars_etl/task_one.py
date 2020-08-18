@@ -16,161 +16,37 @@ We would like you to:
 import contextlib
 import random
 
-from .common import (
-    DB_NAME,
-    STAR_WARS_API,
-    get_endpoint_data,
-    get_json,
-    open_db,
-    remove_none,
-)
-from .create_db import main as create_db__main
+from star_wars_etl import create_db, db_utils, utils
 
 
-def get_film_title(film_endpoint):
+def get_film_data(film_endpoint):
     """
 
     :param film_endpoint:
     :return:
     """
-    res = get_endpoint_data(film_endpoint)
+    res = utils.get_data(film_endpoint)
     if not res:
         return
     return res.get("title"), res.get("url")
 
 
-def get_random_characters_films():
+def get_characters_films(character_resource_id):
     """
 
     :return:
     """
-    endpoint = f"{STAR_WARS_API}/people/{random.randint(1, 87)}"
-    res = get_endpoint_data(endpoint)
+    endpoint = utils.generate_url("people")(character_resource_id)
+    res = utils.get_data(endpoint)
     if not res:
         return
 
     film_endpoints = res.get("films")
     films = []
     if film_endpoints:
-        films = [get_film_title(film_endpoint)
+        films = [get_film_data(film_endpoint)
                  for film_endpoint in film_endpoints]
-    return res.get("name"), res.get("url"), remove_none(films)
-
-
-def insert_characters(cursor, characters):
-    """
-
-    :param cursor:
-    :param characters:
-    :return:
-    """
-    sql = "INSERT IGNORE INTO `character` (name, endpoint) VALUES (%s, %s)"
-    return cursor.executemany(sql, characters)
-
-
-def insert_films(cursor, films):
-    """
-
-    :param cursor:
-    :param films:
-    :return:
-    """
-    sql = "INSERT IGNORE INTO `film` (title, endpoint) VALUES (%s, %s)"
-    return cursor.executemany(sql, films)
-
-
-def insert_character_film(cursor, character_film_ids):
-    """
-
-    :param cursor:
-    :param character_film_ids:
-    :return:
-    """
-    sql = '''INSERT IGNORE INTO `character_film` (character_id, film_id)
-    VALUES (%s, %s)'''
-    return cursor.executemany(sql, character_film_ids)
-
-
-def get_characters(cursor):
-    """
-
-    :param cursor:
-    :return:
-    """
-    sql = "SELECT id, name, endpoint FROM `character`"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-
-def get_character(cursor, name):
-    """
-
-    :param cursor:
-    :param name:
-    :return:
-    """
-    sql = "SELECT id, name, endpoint FROM `character` WHERE name = %s"
-    cursor.execute(sql, (name,))
-    return cursor.fetchone()
-
-
-def get_films(cursor):
-    """
-
-    :param cursor:
-    :return:
-    """
-    sql = "SELECT id, title, endpoint FROM `film`"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-
-def get_film(cursor, title):
-    """
-
-    :param cursor:
-    :param title:
-    :return:
-    """
-    sql = "SELECT id, title, endpoint FROM `film` WHERE title = %s"
-    cursor.execute(sql, (title,))
-    return cursor.fetchone()
-
-
-def get_character_join_film(cursor, character_id):
-    """
-
-    :param cursor:
-    :param character_id:
-    :return:
-    """
-    sql = '''SELECT character.name, character.endpoint, 
-    film.title, film.endpoint 
-    FROM `character_film` 
-    INNER JOIN `character` ON character_film.character_id = character.id
-    INNER JOIN `film` ON character_film.film_id = film.id
-    WHERE character.id = %s
-    '''
-    cursor.execute(sql, (character_id,))
-    return cursor.fetchall()
-
-
-def get_film_join_character(cursor, film_id):
-    """
-
-    :param cursor:
-    :param film_id:
-    :return:
-    """
-    sql = '''SELECT film.title, film.endpoint, 
-    character.name, character.endpoint 
-    FROM `character_film`
-    INNER JOIN `character` ON character_film.character_id = character.id
-    INNER JOIN `film` ON character_film.film_id = film.id
-    WHERE film.id = %s
-    '''
-    cursor.execute(sql, (film_id,))
-    return cursor.fetchall()
+    return res.get("name"), res.get("url"), utils.remove_none(films)
 
 
 def add_characters_films(connection, characters_films, characters, films):
@@ -184,19 +60,20 @@ def add_characters_films(connection, characters_films, characters, films):
     """
     try:
         with contextlib.closing(connection.cursor()) as cursor:
-            insert_characters(cursor, characters)
-            insert_films(cursor, films)
+            db_utils.insert_characters(cursor, characters)
+            db_utils.insert_films(cursor, films)
             connection.commit()
         with contextlib.closing(connection.cursor()) as cursor:
             for character_film in characters_films:
-                character_id = get_character(cursor,
-                                             character_film[0]).get("id")
+                character_id = db_utils.get_character(
+                    cursor, character_film[0]).get("id")
                 character_film_ids = [
-                    (character_id, get_film(cursor, film[0]).get("id"))
+                    (character_id,
+                     db_utils.get_film(cursor, film[0]).get("id"))
                     for film in character_film[2]
                 ]
                 if character_film_ids:
-                    insert_character_film(cursor, character_film_ids)
+                    db_utils.insert_character_film(cursor, character_film_ids)
             connection.commit()
         return True
     except:
@@ -213,10 +90,11 @@ def get_output(connection):
     :rtype:
     """
     with contextlib.closing(connection.cursor()) as cursor:
-        db_films = get_films(cursor)
+        db_films = db_utils.get_films(cursor)
         output = []
         for film in db_films:
-            film_characters = get_film_join_character(cursor, film.get("id"))
+            film_characters = db_utils.get_film_join_character(
+                cursor, film.get("id"))
             output.append(
                 {
                     "film": film.get("title"),
@@ -231,30 +109,30 @@ def get_output(connection):
 def main():
     """entrypoint to the program"""
     # building list of unique character-film combinations
-    characters_films = remove_none(
-        [get_random_characters_films() for _ in range(1, 15)]
+    characters_films = utils.remove_none(
+        [get_characters_films(random.randint(1, 87)) for _ in range(1, 15)]
     )
     # building list of unique characters
-    characters = remove_none(list(set(
+    characters = utils.remove_none(list(set(
         [character_film[:2] for character_film in characters_films]
     )))
     # building list of unique films
-    films = remove_none(list(set(
+    films = utils.remove_none(list(set(
         [film for character_film in characters_films
          for film in character_film[2]]
     )))
 
-    with contextlib.closing(open_db(DB_NAME)) as connection:
+    with contextlib.closing(db_utils.open_db(True)) as connection:
         # inserting data into database
         add_characters_films(connection, characters_films, characters, films)
         # retrieving the output
         output = get_output(connection)
 
-    json_output = get_json(output)
+    json_output = utils.get_json(output)
     print(json_output)
     return json_output
 
 
 if __name__ == "__main__":
-    create_db__main()
+    create_db.main()
     main()

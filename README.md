@@ -23,16 +23,15 @@ your database's username, user's password, and the name of the database.
 ### Execute Tasks
 
 1. Open a terminal and navigate to project's root directory
-2. Run `cd star_wars_etl`
-3. task one: Run `./task_one.py`
-task two: Run `./task_two.py`
+2. task one: Run `python3 -m star_wars_etl.task_one`
+task two: Run `python3 -m star_wars_etl.task_two`
 
 ### Execute Tests
 
 1. Open a terminal and navigate to project's root directory
-2. Run a single test case: `python3 -m unittest star_wars_etl.test.{test_filename}`
-    - Example: `python3 -m unittest star_wars_etl.test.test_common`
-3. Run all test cases: `python3 -m unittest discover`
+2. Run a single test case: `python3 -m unittest -v star_wars_etl.test.{test_filename}`
+    - Example: `python3 -m unittest -v star_wars_etl.test.test_utils`
+3. Run all test cases: `python3 -m unittest discover -v -s star_wars_etl/test`
 
 ## Task One
 

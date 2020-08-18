@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 import contextlib
 
-from .common import (
-    DB_NAME,
-    open_db,
-)
+from star_wars_etl import db_utils
 
 
 def drop_database(conn):
     """Drop database if already exists."""
     with contextlib.closing(conn.cursor()) as cursor:
-        cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+        cursor.execute(f"DROP DATABASE IF EXISTS {db_utils.DB_NAME}")
     return conn.commit()
 
 
 def create_database(conn):
     """Create database"""
     with contextlib.closing(conn.cursor()) as cursor:
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_utils.DB_NAME}")
     return conn.commit()
 
 
@@ -62,11 +59,11 @@ def create_tables(conn):
 
 def main():
     """entrypoint of program"""
-    with contextlib.closing(open_db()) as conn:
+    with contextlib.closing(db_utils.open_db()) as conn:
         drop_database(conn)
 
         create_database(conn)
-        conn.select_db(DB_NAME)
+        conn.select_db(db_utils.DB_NAME)
 
         create_tables(conn)
 
