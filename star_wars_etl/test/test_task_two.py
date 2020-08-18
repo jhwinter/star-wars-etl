@@ -256,7 +256,7 @@ class TestTaskTwo(unittest.TestCase):
             dict_output[task_two.CHARACTERS][0]["weight"],
             utils.convert_weight(mock_char_res["mass"])
         )
-        parent_dir = pathlib.Path(__file__).parent.parent
+        parent_dir = pathlib.Path(__file__).parent.parent.parent
         filepath = parent_dir.joinpath("task_two.json")
         self.assertTrue(filepath.is_file())
 

@@ -4,7 +4,8 @@
 
 ### Requirements
 
-- Python 3.8
+- [Python 3.8](https://www.python.org/downloads/)
+- [pipenv](https://pypi.org/project/pipenv/)
 - [Install and Setup MySQL Database locally](https://dev.mysql.com/doc/mysql-getting-started/en/)
 
 ### Setup
@@ -23,8 +24,9 @@ your database's username, user's password, and the name of the database.
 ### Execute Tasks
 
 1. Open a terminal and navigate to project's root directory
-2. task one: Run `python3 -m star_wars_etl.task_one`
-task two: Run `python3 -m star_wars_etl.task_two`
+2. Execute Tasks
+    - task one: Run `python3 -m star_wars_etl.task_one`
+    - task two: Run `python3 -m star_wars_etl.task_two`
 
 ### Execute Tests
 

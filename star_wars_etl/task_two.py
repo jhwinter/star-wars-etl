@@ -80,7 +80,7 @@ def main():
     film = get_film()
     output = format_film_data(film.copy())
     json_output = utils.get_json(output)
-    parent_dir = pathlib.Path(__file__).parent
+    parent_dir = pathlib.Path(__file__).parent.parent
     with open(parent_dir.joinpath("task_two.json"), "w") as f:
         f.write(json_output)
 
