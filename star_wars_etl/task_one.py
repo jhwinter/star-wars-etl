@@ -20,11 +20,7 @@ from star_wars_etl import create_db, db_utils, utils
 
 
 def get_film_data(film_endpoint):
-    """
-
-    :param film_endpoint:
-    :return:
-    """
+    """Retrieves the film's title and url"""
     res = utils.get_data(film_endpoint)
     if not res:
         return
@@ -32,10 +28,7 @@ def get_film_data(film_endpoint):
 
 
 def get_characters_films(character_resource_id):
-    """
-
-    :return:
-    """
+    """Retrieves the character's name, url, and their list of films"""
     endpoint = utils.generate_url("people")(character_resource_id)
     res = utils.get_data(endpoint)
     if not res:
@@ -50,14 +43,9 @@ def get_characters_films(character_resource_id):
 
 
 def add_characters_films(connection, characters_films, characters, films):
-    """
-
-    :param connection:
-    :param characters_films:
-    :param characters:
-    :param films:
-    :return:
-    """
+    """Inserts the provided characters and films into the database.
+    Then, inserts the character and film id's into the character_films
+    table."""
     try:
         with contextlib.closing(connection.cursor()) as cursor:
             db_utils.insert_characters(cursor, characters)
@@ -82,13 +70,8 @@ def add_characters_films(connection, characters_films, characters, films):
 
 
 def get_output(connection):
-    """
-
-    :param connection:
-    :type connection:
-    :return:
-    :rtype:
-    """
+    """Gets a list of all the films, then builds a dictionary using
+    the film title and each character that appeared in that film."""
     with contextlib.closing(connection.cursor()) as cursor:
         db_films = db_utils.get_films(cursor)
         output = []

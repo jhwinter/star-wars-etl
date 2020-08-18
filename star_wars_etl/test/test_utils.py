@@ -67,6 +67,7 @@ class TestUtils(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(responses.GET, url, json={"test": "tester"}, status=200)
             resp = utils.get_data(url)
+            rsps.reset()
 
         self.assertEqual(resp, {"test": "tester"})
 

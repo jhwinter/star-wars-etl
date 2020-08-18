@@ -54,27 +54,23 @@ def sanitize_cross_ref_mat_data(data, endpoint_name):
 
 def format_film_data(film_data):
     """Retrieves the data from the reference endpoints, removes
-    all cross-referencing material, and
-    converts the height (cm) and mass (kg) to ft + in and weight (lb)
-    for all characters
-
-    :param film_data:
-    :type film_data:
-    :return:
-    :rtype:
-    """
-    keys = (CHARACTERS, PLANETS, SPECIES, STARSHIPS, VEHICLES)
-    for key in keys:
-        for idx, endpoint in enumerate(film_data[key]):
-            film_data[key][idx] = sanitize_cross_ref_mat_data(
-                utils.get_data(endpoint), key
+    all cross-referencing material, and converts the
+    height (cm) and mass (kg) to ft + in and weight (lb)
+    for all characters"""
+    resources = {CHARACTERS, PLANETS, SPECIES, STARSHIPS, VEHICLES}
+    for resource in resources:
+        for idx, endpoint in enumerate(film_data[resource]):
+            film_data[resource][idx] = sanitize_cross_ref_mat_data(
+                utils.get_data(endpoint), resource
             )
-            if key == CHARACTERS:
-                std_height = utils.convert_height(film_data[key][idx]["height"])
-                std_weight = utils.convert_weight(film_data[key][idx]["mass"])
-                film_data[key][idx]["height"] = std_height
-                film_data[key][idx]["weight"] = std_weight
-                film_data.pop("mass", None)
+            if resource == CHARACTERS:
+                std_height = utils.convert_height(
+                    film_data[resource][idx]["height"])
+                std_weight = utils.convert_weight(
+                    film_data[resource][idx]["mass"])
+                film_data[resource][idx]["height"] = std_height
+                film_data[resource][idx]["weight"] = std_weight
+                film_data[resource][idx].pop("mass", None)
 
     return film_data
 

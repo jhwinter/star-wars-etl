@@ -18,6 +18,7 @@ def get_json(data):
 
 
 def generate_url(resource):
+    """Generates a star wars api url"""
     def get_resource(resource_id):
         return f"{STAR_WARS_API}/{resource}/{resource_id}/"
 

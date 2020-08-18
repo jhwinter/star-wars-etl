@@ -24,34 +24,19 @@ def open_db(include_db=False):
 
 # create
 def insert_characters(cursor, characters):
-    """
-
-    :param cursor:
-    :param characters:
-    :return:
-    """
+    """Inserts characters into the database"""
     sql = "INSERT IGNORE INTO `character` (name, endpoint) VALUES (%s, %s)"
     return cursor.executemany(sql, characters)
 
 
 def insert_films(cursor, films):
-    """
-
-    :param cursor:
-    :param films:
-    :return:
-    """
+    """Inserts films into the database"""
     sql = "INSERT IGNORE INTO `film` (title, endpoint) VALUES (%s, %s)"
     return cursor.executemany(sql, films)
 
 
 def insert_character_film(cursor, character_film_ids):
-    """
-
-    :param cursor:
-    :param character_film_ids:
-    :return:
-    """
+    """Inserts character_id and film_id into the join table"""
     sql = '''INSERT IGNORE INTO `character_film` (character_id, film_id)
     VALUES (%s, %s)'''
     return cursor.executemany(sql, character_film_ids)
@@ -59,58 +44,35 @@ def insert_character_film(cursor, character_film_ids):
 
 # read
 def get_characters(cursor):
-    """
-
-    :param cursor:
-    :return:
-    """
+    """Retrieves all characters from the database"""
     sql = "SELECT id, name, endpoint FROM `character`"
     cursor.execute(sql)
     return cursor.fetchall()
 
 
 def get_character(cursor, name):
-    """
-
-    :param cursor:
-    :param name:
-    :return:
-    """
+    """Retrieves a character from the database with a given name"""
     sql = "SELECT id, name, endpoint FROM `character` WHERE name = %s"
     cursor.execute(sql, (name,))
     return cursor.fetchone()
 
 
 def get_films(cursor):
-    """
-
-    :param cursor:
-    :return:
-    """
+    """Retrieves all films from the database"""
     sql = "SELECT id, title, endpoint FROM `film`"
     cursor.execute(sql)
     return cursor.fetchall()
 
 
 def get_film(cursor, title):
-    """
-
-    :param cursor:
-    :param title:
-    :return:
-    """
+    """Retrieves a film from the database with a given title"""
     sql = "SELECT id, title, endpoint FROM `film` WHERE title = %s"
     cursor.execute(sql, (title,))
     return cursor.fetchone()
 
 
 def get_character_join_film(cursor, character_id):
-    """
-
-    :param cursor:
-    :param character_id:
-    :return:
-    """
+    """Retrieves character and film information given a character id"""
     sql = '''SELECT character.id, character.name, character.endpoint, 
     film.id, film.title, film.endpoint 
     FROM `character_film` 
@@ -123,12 +85,7 @@ def get_character_join_film(cursor, character_id):
 
 
 def get_film_join_character(cursor, film_id):
-    """
-
-    :param cursor:
-    :param film_id:
-    :return:
-    """
+    """Retrieves character and film information given a film id"""
     sql = '''SELECT film.id, film.title, film.endpoint, 
     character.id, character.name, character.endpoint 
     FROM `character_film`
