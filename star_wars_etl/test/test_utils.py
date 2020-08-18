@@ -62,12 +62,12 @@ class TestUtils(unittest.TestCase):
             the_response.json.return_value
         )
 
-    @responses.activate
     def test_get_data(self):
         url = utils.generate_url("people")(1)
-        responses.add(responses.GET, url, json={"test": "tester"}, status=200)
+        with responses.RequestsMock() as rsps:
+            rsps.add(responses.GET, url, json={"test": "tester"}, status=200)
+            resp = utils.get_data(url)
 
-        resp = utils.get_data(url)
         self.assertEqual(resp, {"test": "tester"})
 
     def test_cm_to_in(self):
